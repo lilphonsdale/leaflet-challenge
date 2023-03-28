@@ -7,19 +7,19 @@ var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 
 var map = L.map("map",{
     center: [44.966667, -103.766667],
-    zoom: 4,
+    zoom: 5,
 });
 
 // Add our tile layer to the map.
 basemap.addTo(map);
 
 function getColor(d) {
-    return d > 90  ? '#d73027' :
-           d > 70  ? '#fc8d59' :
-           d > 50   ? '#fee08b':
-           d > 30   ? '#d9ef8b' :
-           d > 10   ? '#91cf60' :
-           '#1a9850';
+    return d > 90  ? '#cc0000' :
+           d > 70  ? '#ff3333' :
+           d > 50   ? '#ff9933':
+           d > 30   ? '#ffff33' :
+           d > 10   ? '#99ff33' :
+           '#33ff33';
 }
 
 
@@ -42,7 +42,8 @@ d3.json(url).then(function(response) {
     // Add circles to the map.
     L.circle([location.coordinates[1], location.coordinates[0]], {
       fillOpacity: 0.99,
-      color: "white",
+      color: "black",
+      weight: 1,
       fillColor: getColor(depth),
       // Adjust the radius.
       radius: Math.sqrt(magnitude) * 40000
@@ -50,6 +51,8 @@ d3.json(url).then(function(response) {
   }
 
   });
+
+//Adding a legend to explain the color coding
 
   var legend = L.control({position: 'bottomright'});
 
@@ -59,7 +62,7 @@ d3.json(url).then(function(response) {
           grades = [0, 10, 30, 50, 70, 90],
           labels = [];
   
-      // loop through our density intervals and generate a label with a colored square for each interval
+      // loop through our depth intervals and generate a label with a colored square for each interval
       for (var i = 0; i < grades.length; i++) {
           div.innerHTML +=
               '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
