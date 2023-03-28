@@ -8,26 +8,14 @@ var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 var map = L.map("map",{
     center: [44.966667, -103.766667],
     zoom: 4,
-    // layers: [
-    //     layers.shakes
-    // ]
 });
 
 // Add our tile layer to the map.
 basemap.addTo(map);
 
 
-// // // Create a legend to display information about our map.
-// var leg = L.control({
-//   position: "bottomright"
-// });
-
-
-// // Add the info legend to the map.
-// leg.addTo(map);
-
 // Our target url
-url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"
 
 // Perform an API call to earthquake data
 d3.json(url).then(function(response) {
@@ -43,34 +31,66 @@ d3.json(url).then(function(response) {
         var info = features[i].properties.place
 
     // Conditionals for earthquake depth marker
-    var color = "";
-    if (depth > -10) {
-      color = "yellow";
+    // var color = "";
+    // if (depth < 10) {
+    //   color = "green";
+    // }
+    // else if (depth < 30) {
+    //   color = "yellow";
+    // }
+    // else if (depth < 50) {
+    //   color = "orange";
+    // }
+    // else if (depth < 70) {
+    //     color = "red";
+    //   }
+    // else if (depth < 90) {
+    //     color = "purple";
+    //   }
+    // else {
+    //   color = "blue";
+    // }
+
+    function getColor(d) {
+        return d > 90  ? '#d73027' :
+               d > 70  ? '#fc8d59' :
+               d > 50   ? '#fee08b':
+               d > 30   ? '#d9ef8b' :
+               d > 10   ? '#91cf60' :
+               '#1a9850';
     }
-    else if (depth > 10) {
-      color = "green";
-    }
-    else if (depth > 30) {
-      color = "orange";
-    }
-    else if (depth > 50) {
-        color = "green";
-      }
-    else if (depth > 70) {
-        color = "green";
-      }
-    else {
-      color = "red";
-    }
-  
+
     // Add circles to the map.
     L.circle([location.coordinates[1], location.coordinates[0]], {
-      fillOpacity: 0.9,
+      fillOpacity: 0.99,
       color: "white",
-      fillColor: color,
+      fillColor: getColor(depth),
       // Adjust the radius.
-      radius: Math.sqrt(magnitude) * 50000
-    }).bindPopup(`<h1>${info}</h1> <hr> <h3>Yikes</h3>`).addTo(map);
+      radius: Math.sqrt(magnitude) * 40000
+    }).bindPopup(`<h2>${info}</h2> <hr> <h3>Magnitude:${magnitude}</h3> <hr> <h3> Depth:${depth}</h3>`).addTo(map);
   }
+
+  var legend = L.control({position: 'bottomright'});
+
+  legend.onAdd = function (map) {
+  
+      var div = L.DomUtil.create('div', 'info legend'),
+          grades = [0, 10, 30, 50, 70, 90],
+          labels = [];
+  
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < grades.length; i++) {
+          div.innerHTML +=
+              '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+      }
+  
+      return div;
+  };
+  
+  legend.addTo(map);
+
   });
+
+
   
