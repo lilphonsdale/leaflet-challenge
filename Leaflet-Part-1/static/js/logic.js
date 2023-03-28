@@ -13,6 +13,15 @@ var map = L.map("map",{
 // Add our tile layer to the map.
 basemap.addTo(map);
 
+function getColor(d) {
+    return d > 90  ? '#d73027' :
+           d > 70  ? '#fc8d59' :
+           d > 50   ? '#fee08b':
+           d > 30   ? '#d9ef8b' :
+           d > 10   ? '#91cf60' :
+           '#1a9850';
+}
+
 
 // Our target url
 url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"
@@ -30,36 +39,6 @@ d3.json(url).then(function(response) {
         var magnitude = features[i].properties.mag
         var info = features[i].properties.place
 
-    // Conditionals for earthquake depth marker
-    // var color = "";
-    // if (depth < 10) {
-    //   color = "green";
-    // }
-    // else if (depth < 30) {
-    //   color = "yellow";
-    // }
-    // else if (depth < 50) {
-    //   color = "orange";
-    // }
-    // else if (depth < 70) {
-    //     color = "red";
-    //   }
-    // else if (depth < 90) {
-    //     color = "purple";
-    //   }
-    // else {
-    //   color = "blue";
-    // }
-
-    function getColor(d) {
-        return d > 90  ? '#d73027' :
-               d > 70  ? '#fc8d59' :
-               d > 50   ? '#fee08b':
-               d > 30   ? '#d9ef8b' :
-               d > 10   ? '#91cf60' :
-               '#1a9850';
-    }
-
     // Add circles to the map.
     L.circle([location.coordinates[1], location.coordinates[0]], {
       fillOpacity: 0.99,
@@ -69,6 +48,8 @@ d3.json(url).then(function(response) {
       radius: Math.sqrt(magnitude) * 40000
     }).bindPopup(`<h2>${info}</h2> <hr> <h3>Magnitude:${magnitude}</h3> <hr> <h3> Depth:${depth}</h3>`).addTo(map);
   }
+
+  });
 
   var legend = L.control({position: 'bottomright'});
 
@@ -89,8 +70,4 @@ d3.json(url).then(function(response) {
   };
   
   legend.addTo(map);
-
-  });
-
-
   
