@@ -3,12 +3,6 @@ var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
-// Create a layer for our markers
-
-// var layers = {
-//     shakes: new L.LayerGroup()
-// };
-
 // Create the map
 
 var map = L.map("map",{
@@ -22,38 +16,15 @@ var map = L.map("map",{
 // Add our tile layer to the map.
 basemap.addTo(map);
 
-// //create an overlays object
-
-// var overlay = {
-//     "Quakes": layers.shakes
-// };
-
-// // // Create a control for our layers, and add our overlays to it.
-// L.control.layers(null, layers).addTo(map);
 
 // // // Create a legend to display information about our map.
-// var info = L.control({
+// var leg = L.control({
 //   position: "bottomright"
 // });
 
-// // When the layer control is added, insert a div with the class of "legend".
-// info.onAdd = function() {
-//     var div = L.DomUtil.create("div", "legend");
-//     return div;
-// };
 
 // // Add the info legend to the map.
-// info.addTo(map);
-
-
-// var icons = {
-//     trembler: L.ExtraMarkers.icon({
-//     icon: "ion-settings",
-//     iconColor: "white",
-//     markerColor: "yellow",
-//     shape: "star"
-// })
-// };
+// leg.addTo(map);
 
 // Our target url
 url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
@@ -67,23 +38,39 @@ d3.json(url).then(function(response) {
 
     for (var i = 0; i < features.length; i++) {
         var location = features[i].geometry;
-    
-        if (location) {
-          L.marker([location.coordinates[1], location.coordinates[0]]).addTo(map);
-        }
+        var depth = location.coordinates[2]
+        var magnitude = features[i].properties.mag
+        var info = features[i].properties.place
+
+    // Conditionals for earthquake depth marker
+    var color = "";
+    if (depth > -10) {
+      color = "yellow";
+    }
+    else if (depth > 10) {
+      color = "green";
+    }
+    else if (depth > 30) {
+      color = "orange";
+    }
+    else if (depth > 50) {
+        color = "green";
       }
-
-    // // Create a new marker with the appropriate icon and coordinates.
-    // var newMarker = L.marker([coordinates], {
-    //     icon: equake
-    //   });
-
-    //   // Add the new marker to the appropriate layer.
-    //   newMarker.addTo(layers[layer]);
-
-    //   // Bind a popup to the marker that will  display on being clicked. This will be rendered as HTML.
-    //   newMarker.bindPopup("Wow");
-    // };
+    else if (depth > 70) {
+        color = "green";
+      }
+    else {
+      color = "red";
+    }
   
+    // Add circles to the map.
+    L.circle([location.coordinates[1], location.coordinates[0]], {
+      fillOpacity: 0.9,
+      color: "white",
+      fillColor: color,
+      // Adjust the radius.
+      radius: Math.sqrt(magnitude) * 50000
+    }).bindPopup(`<h1>${info}</h1> <hr> <h3>Yikes</h3>`).addTo(map);
+  }
   });
   
