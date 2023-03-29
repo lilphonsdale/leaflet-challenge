@@ -47,7 +47,7 @@ d3.json(url).then(function(response) {
       fillColor: getColor(depth),
       // Adjust the radius.
       radius: Math.sqrt(magnitude) * 40000
-    }).bindPopup(`<h2>${info}</h2> <hr> <h3>Magnitude:${magnitude}</h3> <hr> <h3> Depth:${depth}</h3>`).addTo(map);
+    }).bindPopup(`<h2>${info}</h2> <hr> <h3>Magnitude:${magnitude}</h3><h3>Depth:${depth}</h3>`).addTo(map);
   }
 
   });
